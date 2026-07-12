@@ -20,7 +20,7 @@ export const addTool = async (toolData) => {
 
 export const getAllTools = async () => {
   try {
-    const q = query(collection(db, 'tools'), orderBy('createdAt', 'desc'))
+    const snapshot = await getDocs(collection(db, 'tools'))
     const snapshot = await getDocs(q)
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
   } catch (error) {
@@ -31,12 +31,7 @@ export const getAllTools = async () => {
 
 export const getTrendingTools = async () => {
   try {
-    const q = query(
-      collection(db, 'tools'),
-      where('isTrending', '==', true),
-      limit(6)
-    )
-    const snapshot = await getDocs(q)
+    const snapshot = await getDocs(collection(db, 'tools'))
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
   } catch (error) {
     console.error(error)
