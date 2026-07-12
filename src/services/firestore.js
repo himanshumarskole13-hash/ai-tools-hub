@@ -1,5 +1,16 @@
 import { db } from './firebase'
-import { collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc, query, where, orderBy, limit } from 'firebase/firestore'
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
+  where,
+  limit,
+} from 'firebase/firestore'
 import toast from 'react-hot-toast'
 
 export const addTool = async (toolData) => {
@@ -21,8 +32,10 @@ export const addTool = async (toolData) => {
 export const getAllTools = async () => {
   try {
     const snapshot = await getDocs(collection(db, 'tools'))
-    const snapshot = await getDocs(q)
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
   } catch (error) {
     console.error(error)
     throw error
@@ -31,8 +44,16 @@ export const getAllTools = async () => {
 
 export const getTrendingTools = async () => {
   try {
-    const snapshot = await getDocs(collection(db, 'tools'))
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    const q = query(
+      collection(db, 'tools'),
+      where('isTrending', '==', true),
+      limit(6)
+    )
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
   } catch (error) {
     console.error(error)
     throw error
@@ -41,13 +62,11 @@ export const getTrendingTools = async () => {
 
 export const getLatestTools = async () => {
   try {
-    const q = query(
-      collection(db, 'tools'),
-      orderBy('createdAt', 'desc'),
-      limit(6)
-    )
-    const snapshot = await getDocs(q)
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    const snapshot = await getDocs(collection(db, 'tools'))
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
   } catch (error) {
     console.error(error)
     throw error
@@ -58,9 +77,14 @@ export const getToolById = async (toolId) => {
   try {
     const docRef = doc(db, 'tools', toolId)
     const docSnap = await getDoc(docRef)
+
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() }
+      return {
+        id: docSnap.id,
+        ...docSnap.data(),
+      }
     }
+
     return null
   } catch (error) {
     console.error(error)
@@ -71,10 +95,12 @@ export const getToolById = async (toolId) => {
 export const updateTool = async (toolId, toolData) => {
   try {
     const docRef = doc(db, 'tools', toolId)
+
     await updateDoc(docRef, {
       ...toolData,
       updatedAt: new Date(),
     })
+
     toast.success('Tool updated successfully!')
   } catch (error) {
     toast.error('Failed to update tool')
@@ -101,10 +127,11 @@ export const addContactMessage = async (messageData) => {
       createdAt: new Date(),
       read: false,
     })
+
     toast.success('Message sent successfully!')
   } catch (error) {
     toast.error('Failed to send message')
     console.error(error)
     throw error
   }
-}
+      }
